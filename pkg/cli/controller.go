@@ -3,6 +3,7 @@ package cli
 import (
 	"flag"
 	"fmt"
+
 	"github.com/name212/mines/pkg/game"
 )
 

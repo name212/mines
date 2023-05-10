@@ -2,8 +2,9 @@ package game
 
 import (
 	"fmt"
-	"github.com/stretchr/testify/require"
 	"testing"
+
+	"github.com/stretchr/testify/require"
 )
 
 func TestPosFromLinear(t *testing.T) {
@@ -254,6 +255,6 @@ func TestWalkCellAround(t *testing.T) {
 	// right line
 	assertWalkAround(t, 7, 4, []testPos{{7, 3}, {7, 5}, {6, 3}, {6, 4}, {6, 5}})
 
-	// center line
+	// center
 	assertWalkAround(t, 4, 4, []testPos{{3, 3}, {3, 4}, {3, 5}, {4, 3}, {4, 5}, {5, 3}, {5, 4}, {5, 5}})
 }

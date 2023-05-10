@@ -67,17 +67,11 @@ func (f *Field) Clone() *Field {
 }
 
 func (f *Field) Walk(walker CellWalker) {
-	stop := false
 	for y := 0; y < f.Height(); y++ {
 		for x := 0; x < f.Width(); x++ {
-			stop = walker.HandleCell(f.cell(x, y))
-			if stop {
-				break
+			if walker.HandleCell(f.cell(x, y)) {
+				return
 			}
-		}
-
-		if stop {
-			break
 		}
 	}
 }
@@ -99,19 +93,14 @@ func (f *Field) WalkAroundCell(x, y int, walker CellWalker) {
 		endY = f.height - 1
 	}
 
-	stop := false
 	for i := startX; i <= endX; i++ {
 		for j := startY; j <= endY; j++ {
 			if i == x && j == y {
 				continue
 			}
-			stop = walker.HandleCell(f.cell(i, j))
-			if stop {
-				break
+			if walker.HandleCell(f.cell(i, j)) {
+				return
 			}
-		}
-		if stop {
-			break
 		}
 	}
 }
