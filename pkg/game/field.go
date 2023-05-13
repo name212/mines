@@ -56,20 +56,20 @@ func (f *Field) Height() int {
 	return f.height
 }
 
-func (f *Field) cell(x, y int) *Cell {
+func (f *Field) Cell(x, y int) *Cell {
 	return f.cells[y][x]
 }
 
 func (f *Field) Clone() *Field {
 	return newField(f.Width(), f.Height(), func(x, y int) *Cell {
-		return f.cell(x, y).clone()
+		return f.Cell(x, y).clone()
 	})
 }
 
 func (f *Field) Walk(walker CellWalker) {
 	for y := 0; y < f.Height(); y++ {
 		for x := 0; x < f.Width(); x++ {
-			if walker.HandleCell(f.cell(x, y)) {
+			if walker.HandleCell(f.Cell(x, y)) {
 				return
 			}
 		}
@@ -98,7 +98,7 @@ func (f *Field) WalkAroundCell(x, y int, walker CellWalker) {
 			if i == x && j == y {
 				continue
 			}
-			if walker.HandleCell(f.cell(i, j)) {
+			if walker.HandleCell(f.Cell(i, j)) {
 				return
 			}
 		}
@@ -109,7 +109,7 @@ func (f *Field) linearFromPos(x, y int) int {
 	return y*f.width + x
 }
 
-func (f *Field) size() int {
+func (f *Field) Size() int {
 	return f.width * f.height
 }
 

@@ -17,14 +17,15 @@ const (
 )
 
 type Mines struct {
-	field          *Field
-	bombs          int
-	bombsMarked    int
-	status         Status
-	startedAt      time.Time
-	finishedAt     time.Time
-	finishChecker  *finishGameChecker
-	bombsGenerator RandNumGenerator
+	field            *Field
+	outputFieldCache *Field
+	bombs            int
+	bombsMarked      int
+	status           Status
+	startedAt        time.Time
+	finishedAt       time.Time
+	finishChecker    *finishGameChecker
+	bombsGenerator   RandNumGenerator
 }
 
 func NewGame(width, height int, bombs int, bombsGenerator RandNumGenerator) *Mines {
@@ -49,29 +50,34 @@ func (m *Mines) Open(x, y int) {
 		m.startedAt = time.Now()
 		m.calcOpened(x, y)
 		m.status = Started
+		m.outputFieldCache = nil
 		return
 	}
 
-	if m.field.cell(x, y).MarkedAsBomb() {
+	if m.field.Cell(x, y).MarkedAsBomb() {
 		return
 	}
+
+	m.outputFieldCache = nil
 
 	m.calcOpened(x, y)
 	m.calcFinished()
 }
 
 func (m *Mines) SwitchMarkAsBomb(x, y int) {
-	c := m.field.cell(x, y)
+	c := m.field.Cell(x, y)
 	c.markedAsBomb = !c.MarkedAsBomb()
 	if c.MarkedAsBomb() {
 		m.bombsMarked++
 	} else {
 		m.bombsMarked--
 	}
+
+	m.outputFieldCache = nil
 }
 
 func (m *Mines) calcOpened(x, y int) {
-	cell := m.field.cell(x, y)
+	cell := m.field.Cell(x, y)
 	cell.opened = true
 	if cell.HasBomb() {
 		m.lose()
@@ -129,7 +135,7 @@ func (m *Mines) calcFinished() {
 		return
 	}
 
-	shouldOpened := m.field.size() - m.bombs
+	shouldOpened := m.field.Size() - m.bombs
 	if shouldOpened == m.finishChecker.openedCells {
 		m.finishedAt = time.Now()
 		m.status = Win
@@ -137,7 +143,11 @@ func (m *Mines) calcFinished() {
 }
 
 func (m *Mines) Field() *Field {
-	return m.field.Clone()
+	if m.outputFieldCache == nil {
+		m.outputFieldCache = m.field.Clone()
+	}
+
+	return m.outputFieldCache
 }
 
 func (m *Mines) Status() Status {

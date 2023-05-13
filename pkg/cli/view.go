@@ -2,11 +2,10 @@ package cli
 
 import (
 	"fmt"
+	"github.com/name212/mines/pkg/view"
 
 	"github.com/name212/mines/pkg/game"
 )
-
-const bombSymb = "*"
 
 type Game interface {
 	Field() *game.Field
@@ -50,29 +49,19 @@ func (v *View) printLineDelim() {
 	fmt.Println()
 }
 
+var syms = &view.Symbols{
+	MarkedBomb: "!",
+	Bomb:       "*",
+	Closed:     "#",
+	Empty:      "",
+}
+
 func (v *View) HandleCell(cell *game.Cell) bool {
 	if cell.X() == 0 {
 		fmt.Printf("%d | ", cell.Y())
 	}
 
-	sym := "#"
-	if cell.Opened() {
-		bombs := cell.BombsAround()
-		sym = " "
-		if bombs > 0 {
-			sym = fmt.Sprintf("%d", bombs)
-		} else if cell.HasBomb() {
-			sym = bombSymb
-		}
-	} else {
-		if cell.MarkedAsBomb() {
-			sym = "!"
-		}
-		if cell.HasBomb() && v.showBombs {
-			sym = bombSymb
-		}
-	}
-	fmt.Printf("%s | ", sym)
+	fmt.Printf("%s | ", view.SymbolForCell(cell, syms, v.showBombs))
 
 	if cell.X() == v.width-1 {
 		v.printLineDelim()
