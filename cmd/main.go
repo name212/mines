@@ -1,9 +1,7 @@
 package main
 
-import (
-	"github.com/name212/mines/pkg/cli"
-)
+import "github.com/name212/mines/pkg/gui"
 
 func main() {
-	cli.Loop()
+	gui.Loop()
 }

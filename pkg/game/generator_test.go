@@ -44,6 +44,6 @@ func TestRandomBombs(t *testing.T) {
 	require.Len(t, linearPositions, bombs)
 	require.NotContains(t, linearPositions, 2)
 	for _, p := range linearPositions {
-		require.Less(t, p, field.size())
+		require.Less(t, p, field.Size())
 	}
 }

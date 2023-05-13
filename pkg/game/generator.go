@@ -23,7 +23,7 @@ func (c *CryptoRandNumberGenerator) Next(max int) (int, error) {
 }
 
 func randomBombsPositions(f *Field, bombs int, reader RandNumGenerator, excludePos []int) ([]int, error) {
-	maxPos := f.size()
+	maxPos := f.Size()
 	if bombs > maxPos {
 		return nil, fmt.Errorf("incorrect max bombs")
 	}
@@ -76,9 +76,9 @@ func (i *initWalkCellAround) Reset() {
 }
 
 func initField(f *Field, bombs int, gen RandNumGenerator, startX, startY int) error {
-	size := f.size()
+	size := f.Size()
 	if bombs > size {
-		return fmt.Errorf("incorrect bombs %d, maximum is %d", bombs, f.size())
+		return fmt.Errorf("incorrect bombs %d, maximum is %d", bombs, f.Size())
 	}
 
 	linearStartPos := f.linearFromPos(startX, startY)
@@ -95,7 +95,7 @@ func initField(f *Field, bombs int, gen RandNumGenerator, startX, startY int) er
 	}
 
 	for _, pos := range bombsInLinear {
-		cell := f.cell(f.posFromLinear(pos))
+		cell := f.Cell(f.posFromLinear(pos))
 		cell.hasBomb = true
 	}
 
