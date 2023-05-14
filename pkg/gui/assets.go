@@ -73,6 +73,8 @@ var (
 		Idle:     hexToColor("2e3436"),
 		Disabled: hexToColor("2e3436"),
 	}
+
+	containerBackground = image.NewNineSliceColor(color.RGBA{0x13, 0x1a, 0x22, 0xff})
 )
 
 func init() {
@@ -89,7 +91,7 @@ func init() {
 
 	fontCell = truetype.NewFace(ttfFont, &truetype.Options{
 		Size:    14,
-		DPI:     144,
+		DPI:     72,
 		Hinting: font.HintingFull,
 	})
 }

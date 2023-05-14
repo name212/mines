@@ -2,16 +2,13 @@ package gui
 
 import (
 	"fmt"
-	"github.com/hajimehoshi/ebiten/v2"
-	"image"
-	"image/color"
-
 	"github.com/ebitenui/ebitenui"
-	ebimage "github.com/ebitenui/ebitenui/image"
 	"github.com/ebitenui/ebitenui/widget"
+	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/name212/mines/pkg/game"
 	customwidget "github.com/name212/mines/pkg/gui/widget"
 	"github.com/name212/mines/pkg/view"
+	"image"
 )
 
 type position struct {
@@ -36,7 +33,7 @@ func newField(ui *ebitenui.UI, f *game.Field, handler fieldEventsHandler) *field
 	var window *widget.Window
 
 	root := widget.NewContainer(
-		widget.ContainerOpts.BackgroundImage(ebimage.NewNineSliceColor(color.RGBA{0x13, 0x1a, 0x22, 0xff})),
+		widget.ContainerOpts.BackgroundImage(containerBackground),
 		widget.ContainerOpts.Layout(
 			widget.NewRowLayout(
 				widget.RowLayoutOpts.Direction(widget.DirectionVertical),
@@ -46,7 +43,7 @@ func newField(ui *ebitenui.UI, f *game.Field, handler fieldEventsHandler) *field
 	)
 
 	statsContainer := widget.NewContainer(
-		widget.ContainerOpts.BackgroundImage(ebimage.NewNineSliceColor(color.RGBA{0x13, 0x1a, 0x22, 0xff})),
+		widget.ContainerOpts.BackgroundImage(containerBackground),
 		widget.ContainerOpts.Layout(
 			widget.NewRowLayout(
 				widget.RowLayoutOpts.Direction(widget.DirectionHorizontal),
@@ -58,7 +55,7 @@ func newField(ui *ebitenui.UI, f *game.Field, handler fieldEventsHandler) *field
 	root.AddChild(statsContainer)
 
 	fieldContainer := widget.NewContainer(
-		widget.ContainerOpts.BackgroundImage(ebimage.NewNineSliceColor(color.RGBA{0x13, 0x1a, 0x22, 0xff})),
+		widget.ContainerOpts.BackgroundImage(containerBackground),
 		widget.ContainerOpts.Layout(
 			widget.NewGridLayout(
 				widget.GridLayoutOpts.Columns(f.Width()),
@@ -80,10 +77,10 @@ func newField(ui *ebitenui.UI, f *game.Field, handler fieldEventsHandler) *field
 
 			// specify that the button's text needs some padding for correct display
 			customwidget.CustomButtonOpts.TextPadding(widget.Insets{
-				Left:   13,
-				Right:  13,
-				Top:    5,
-				Bottom: 5,
+				Left:   4,
+				Right:  4,
+				Top:    4,
+				Bottom: 4,
 			}),
 
 			// add a handler that reacts to clicking the button
@@ -111,23 +108,36 @@ func newField(ui *ebitenui.UI, f *game.Field, handler fieldEventsHandler) *field
 		return false
 	}))
 
-	// construct a button
+	scroll := widget.NewScrollContainer(
+		widget.ScrollContainerOpts.Image(&widget.ScrollContainerImage{
+			Idle:     containerBackground,
+			Disabled: containerBackground,
+			Mask:     containerBackground,
+		}),
+		widget.ScrollContainerOpts.Content(fieldContainer),
+	)
 
-	root.AddChild(fieldContainer)
+	root.AddChild(scroll)
 
 	window = widget.NewWindow(
 		widget.WindowOpts.Modal(),
 		widget.WindowOpts.Contents(root),
-		widget.WindowOpts.Draggable(),
-		widget.WindowOpts.Resizeable(),
-		widget.WindowOpts.MinSize(500, 200),
-		widget.WindowOpts.MaxSize(700, 400),
+		widget.WindowOpts.MaxSize(windowWidth, windowHeight),
 	)
 
 	wWidth, wHeight := window.GetContainer().PreferredSize()
 
 	r := image.Rect(0, 0, wWidth, wHeight)
-	r = r.Add(image.Point{windowWidth/2 - wWidth/2, windowHeight/2 - wHeight/2})
+	x := windowWidth/2 - wWidth/2
+	if x < 0 {
+		x = 0
+	}
+	y := windowHeight/2 - wHeight/2
+	if y < 0 {
+		y = 0
+	}
+	r = r.Add(image.Point{x, y})
+
 	fmt.Println(r.String())
 	window.SetLocation(r)
 
@@ -177,8 +187,7 @@ func (f *field) SetField(nField *game.Field) {
 		}
 
 		if button.Image != nil {
-			if bombs := cell.BombsAround(); bombs > 0 && bombs < 9 {
-				fmt.Println("aaaaaaaa")
+			if bombs, opened := cell.BombsAround(), cell.Opened(); opened && bombs > 0 && bombs < 9 {
 				button.Image.Disabled = colorsCell[bombs]
 			}
 		}
